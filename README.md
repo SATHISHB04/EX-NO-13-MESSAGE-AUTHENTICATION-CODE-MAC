@@ -29,55 +29,34 @@ To implement MESSAGE AUTHENTICATION CODE(MAC)
 #include <stdio.h>
 #include <string.h>
 
-#define MAC_SIZE 32 // Define MAC size in bytes
-
-// Function to compute a simple MAC using XOR
-void computeMAC(const char *key, const char *message, char *mac) {
-    int key_len = strlen(key);
-    int msg_len = strlen(message);
-    
-    // XOR the key and message, repeating if necessary
-    for (int i = 0; i < MAC_SIZE; i++) {
-        mac[i] = key[i % key_len] ^ message[i % msg_len]; // Simple XOR operation
-    }
-    mac[MAC_SIZE] = '\0'; // Null-terminate the MAC string
-}
-
 int main() {
-    char key[100], message[100];
-    char mac[MAC_SIZE + 1]; // Buffer for MAC (+1 for null terminator)
-    char receivedMAC[MAC_SIZE + 1]; // Buffer for input of received MAC
+    char key[50], msg[100], mac[33], rmac[33];
+    int i, k, m;
 
-    // Step 1: Input secret key
-    printf("Enter the secret key: ");
+    printf("Enter key: ");
     scanf("%s", key);
 
-    // Step 2: Input the message
-    printf("Enter the message: ");
-    scanf("%s", message);
+    printf("Enter message: ");
+    scanf("%s", msg);
 
-    // Step 3: Compute the MAC
-    computeMAC(key, message, mac);
+    k = strlen(key);
+    m = strlen(msg);
 
-    // Step 4: Display the computed MAC in hexadecimal
-    printf("Computed MAC (in hex): ");
-    for (int i = 0; i < MAC_SIZE; i++) {
-        printf("%02x", (unsigned char)mac[i]); // Print each byte as hex
-    }
-    printf("\n");
+    for (i = 0; i < 32; i++)
+        mac[i] = key[i % k] ^ msg[i % m];
 
-    // Step 5: Input the received MAC (for verification)
-    printf("Enter the received MAC (as hex): ");
-    for (int i = 0; i < MAC_SIZE; i++) {
-        scanf("%02hhx", &receivedMAC[i]);
-    }
+    printf("Computed MAC: ");
+    for (i = 0; i < 32; i++)
+        printf("%02x", (unsigned char)mac[i]);
 
-    // Compare the computed MAC with the received MAC
-    if (memcmp(mac, receivedMAC, MAC_SIZE) == 0) {
-        printf("MAC verification successful. Message is authentic.\n");
-    } else {
-        printf("MAC verification failed. Message is not authentic.\n");
-    }
+    printf("\nEnter received MAC: ");
+    for (i = 0; i < 32; i++)
+        scanf("%2hhx", &rmac[i]);
+
+    if (!memcmp(mac, rmac, 32))
+        printf("MAC verification successful.");
+    else
+        printf("MAC verification failed.");
 
     return 0;
 }
